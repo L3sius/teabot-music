@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import av
+import certifi
 import pytest
 from av.error import HTTPForbiddenError
 
@@ -19,6 +20,7 @@ from teabot_music.sources import (
     is_playlist,
     packets,
     spotify_search,
+    stream_options,
     stream_wait,
     target_of,
     tracks_from,
@@ -185,3 +187,9 @@ def test_a_stream_refused_twice_is_a_source_error(monkeypatch: pytest.MonkeyPatc
     with pytest.raises(SourceError, match="refused"):
         YtDlpSource().open("https://youtu.be/x")
     assert resolved == ["https://youtu.be/x", "https://youtu.be/x"]
+
+
+def test_streams_are_opened_with_certifis_certificates() -> None:
+    options = stream_options({"http_headers": {"User-Agent": "x"}})
+    assert options["ca_file"] == certifi.where()
+    assert options["headers"] == "User-Agent: x\r\n"

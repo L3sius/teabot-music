@@ -1991,6 +1991,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "av" },
+    { name = "certifi" },
     { name = "deno" },
     { name = "requests" },
     { name = "teabot", extra = ["voice"] },
@@ -2009,6 +2010,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "av", specifier = ">=14" },
+    { name = "certifi", specifier = ">=2024.2" },
     { name = "deno", specifier = ">=2.4" },
     { name = "requests", specifier = ">=2.32" },
     { name = "teabot", extras = ["voice"], specifier = ">=1.9,<2" },

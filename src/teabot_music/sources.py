@@ -21,6 +21,7 @@ from fractions import Fraction
 from typing import Any, Protocol, cast
 
 import av
+import certifi
 import yt_dlp
 from av.container import InputContainer
 from av.error import FFmpegError, HTTPForbiddenError
@@ -224,10 +225,23 @@ def stream_wait(info: dict[str, Any], since_s: float) -> float:
     return max(0.0, float(available) - float(asked) - since_s + 0.3)
 
 
-def _open(info: dict[str, Any]) -> InputContainer:
+def stream_options(info: dict[str, Any]) -> dict[str, str]:
+    """FFmpeg's options for reading a stream: yt-dlp's headers, reconnecting, and certifi's certificates. PyAV's
+    Linux wheels look for the system's certificates at a path of their own build, which most systems lack, so
+    without `ca_file` every HTTPS stream fails as "Input/output error"."""
     sent = cast(dict[str, str], info.get("http_headers") or {})
     headers = "".join(f"{k}: {v}\r\n" for k, v in sent.items())
-    options = {"headers": headers, "reconnect": "1", "reconnect_streamed": "1", "reconnect_delay_max": "5"}
+    return {
+        "headers": headers,
+        "reconnect": "1",
+        "reconnect_streamed": "1",
+        "reconnect_delay_max": "5",
+        "ca_file": certifi.where(),
+    }
+
+
+def _open(info: dict[str, Any]) -> InputContainer:
+    options = stream_options(info)
     return av.open(str(info["url"]), options=options, timeout=WEB_TIMEOUT_S)
 
 
