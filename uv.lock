@@ -1951,12 +1951,13 @@ wheels = [
 
 [[package]]
 name = "teabot"
-version = "1.8.0.dev0"
-source = { git = "https://github.com/teabot-dev/teabot?branch=feat%2Fvoice#5092c7330f6bca91fc4856cb70ad317892d8be07" }
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
     { name = "discord-py" },
     { name = "httpx" },
+    { name = "markdown-it-py" },
     { name = "mcp" },
     { name = "packaging" },
     { name = "pydantic" },
@@ -1966,6 +1967,10 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "uvicorn" },
     { name = "watchfiles" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/32/3b/21580f125612af3bf74a1def9d7392c1ffa0da4d43c0f3cdec28c65e8c9a/teabot-1.9.0.tar.gz", hash = "sha256:c33264fa3aba6e4af3e8a23d35a5544bfd2059dcd327fa51db38603a611a29ad", size = 5269154, upload-time = "2026-11-16T19:25:30.589Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b9/56/78f9ef45765ddce373f803b5302f104acbbd178b659ab7198686e394cb02/teabot-1.9.0-py3-none-any.whl", hash = "sha256:dc041d5571c9f945a8b4c1a4b660913c98bf77c865cf306bc969534cc49558d1", size = 268947, upload-time = "2026-11-16T19:25:29.235Z" },
 ]
 
 [package.optional-dependencies]
@@ -2006,7 +2011,7 @@ requires-dist = [
     { name = "av", specifier = ">=14" },
     { name = "deno", specifier = ">=2.4" },
     { name = "requests", specifier = ">=2.32" },
-    { name = "teabot", extras = ["voice"], git = "https://github.com/teabot-dev/teabot?branch=feat%2Fvoice" },
+    { name = "teabot", extras = ["voice"], specifier = ">=1.9,<2" },
     { name = "yt-dlp", specifier = ">=2026.10.26" },
     { name = "yt-dlp-ejs", specifier = ">=0.8" },
 ]
@@ -2016,7 +2021,7 @@ dev = [
     { name = "asyncpg-stubs", specifier = ">=0.30" },
     { name = "pyright", specifier = ">=1.1.414" },
     { name = "ruff", specifier = ">=0.17" },
-    { name = "teabot", extras = ["testing"], git = "https://github.com/teabot-dev/teabot?branch=feat%2Fvoice" },
+    { name = "teabot", extras = ["testing"] },
 ]
 
 [[package]]

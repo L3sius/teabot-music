@@ -1,4 +1,4 @@
-"""teabot-music: members queue songs, and the bot plays them in a voice channel (D53). Imports only `teabot.sdk`.
+"""teabot-music: members queue songs, and the bot plays them in a voice channel (D54). Imports only `teabot.sdk`.
 
 - `music.play` queues a YouTube, YouTube Music, SoundCloud or Spotify link, a YouTube playlist or SoundCloud set,
   or a YouTube search, joining the member's voice channel first.
@@ -34,7 +34,12 @@ class Cfg(BaseModel):
     )
 
 
-plugin = Plugin("music", config=Cfg, hosts=["open.spotify.com"])
+plugin = Plugin(
+    "music",
+    config=Cfg,
+    hosts=["open.spotify.com"],
+    description="Play YouTube, SoundCloud and Spotify tracks in a voice channel, from a queue members share.",
+)
 type Ctx = Context[Cfg]
 
 SOURCE: Source = YtDlpSource()

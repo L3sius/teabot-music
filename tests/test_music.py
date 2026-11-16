@@ -1,4 +1,4 @@
-"""teabot-music, through the real loader, migrations and call path, with a fake source and fake voice (D53)."""
+"""teabot-music, through the real loader, migrations and call path, with a fake source and fake voice (D54)."""
 
 import asyncio
 from collections.abc import Iterator
