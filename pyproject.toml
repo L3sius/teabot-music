@@ -15,6 +15,8 @@ dependencies = [
     "yt-dlp>=2026.10.26",
     "yt-dlp-ejs>=0.8",
     "requests>=2.32",
+    # FFmpeg verifies streams with certifi's certificates: PyAV's Linux wheels find no system ones.
+    "certifi>=2024.2",
     "deno>=2.4",
 ]
 
