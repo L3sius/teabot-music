@@ -32,7 +32,7 @@ voice channel, since its token's member is rarely in one.
 
 ## How it plays
 
-- It needs teabot 1.6 or later with its voice extra, `teabot[voice]` (D53), which this package depends on.
+- It needs teabot 1.8 or later with its voice extra, `teabot[voice]` (D53), which this package depends on.
 - Beyond teabot's own packages it installs PyAV, yt-dlp, yt-dlp-ejs and Deno, which reads YouTube's player code,
   and requests, without which YouTube refused about four streams in nine rather than one.
 - PyAV reads the audio. YouTube serves Opus at 48 kHz, which goes to Discord as it is, at about 1% of a CPU

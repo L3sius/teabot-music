@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 # challenges with Deno and yt-dlp-ejs, which are on PyPI too, so nothing outside PyPI is needed (S8). Of yt-dlp's
 # default extras only requests is kept: without it, YouTube refused about 4 streams in 9 rather than 1 in 9.
 dependencies = [
-    "teabot[voice]>=1.6.0.dev0,<2",
+    "teabot[voice]>=1.8.0.dev0,<2",
     "av>=14",
     "yt-dlp>=2026.10.26",
     "yt-dlp-ejs>=0.8",

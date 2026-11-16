@@ -1951,8 +1951,8 @@ wheels = [
 
 [[package]]
 name = "teabot"
-version = "1.6.0.dev0"
-source = { git = "https://github.com/teabot-dev/teabot?branch=feat%2Fvoice#95b46328aa39b5764a40cb1145c116bd11a6fe10" }
+version = "1.8.0.dev0"
+source = { git = "https://github.com/teabot-dev/teabot?branch=feat%2Fvoice#5092c7330f6bca91fc4856cb70ad317892d8be07" }
 dependencies = [
     { name = "asyncpg" },
     { name = "discord-py" },
