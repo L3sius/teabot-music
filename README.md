@@ -3,8 +3,9 @@
 A [teabot](https://github.com/hballington12/teabot) plugin that plays music in a voice channel: members queue
 YouTube, YouTube Music, SoundCloud or Spotify links, or search YouTube by name.
 
-It is a third-party plugin for self-hosted instances. Streaming YouTube breaks YouTube's terms of service, so it
-is not one of teabot's first-party plugins and is not meant for a hosted catalogue (D47, D53).
+It is a third-party plugin, on the [plugin hub](https://teabot-dev.github.io/teabot/hub/). Streaming YouTube breaks
+YouTube's terms of service, so it is not one of teabot's first-party plugins, and each teabot's operator decides
+whether to install it (D54).
 
 ## Commands
 
@@ -32,7 +33,7 @@ voice channel, since its token's member is rarely in one.
 
 ## How it plays
 
-- It needs teabot 1.8 or later with its voice extra, `teabot[voice]` (D53), which this package depends on.
+- It needs teabot 1.9 or later with its voice extra, `teabot[voice]` (D54), which this package depends on.
 - Beyond teabot's own packages it installs PyAV, yt-dlp, yt-dlp-ejs and Deno, which reads YouTube's player code,
   and requests, without which YouTube refused about four streams in nine rather than one.
 - PyAV reads the audio. YouTube serves Opus at 48 kHz, which goes to Discord as it is, at about 1% of a CPU
@@ -62,9 +63,6 @@ Links to any other site are refused, so members cannot point the bot at an arbit
 
 ## Developing
 
-- Until teabot releases voice, the package builds against its pull request's branch,
-  [teabot-dev/teabot#45](https://github.com/teabot-dev/teabot/pull/45); `uv lock --upgrade-package teabot` follows
-  the branch.
 - Tests need Postgres, as teabot's own do: `uv run pytest`. They use a fake source and teabot's fake voice
   connection, so they need no network; `tests/test_sources.py` checks PyAV with audio files it writes.
 - `tests/snapshot.json` records the commands, tools and job payloads; accept a change with `--teabot-accept`.

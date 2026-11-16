@@ -6,11 +6,11 @@ readme = "README.md"
 license = "MIT"
 authors = [{ name = "Justas Leščinskas" }]
 requires-python = ">=3.12"
-# Voice needs teabot's voice extra (D53). PyAV's wheels carry FFmpeg and libopus, and yt-dlp solves YouTube's
+# Voice needs teabot's voice extra (D54). PyAV's wheels carry FFmpeg and libopus, and yt-dlp solves YouTube's
 # challenges with Deno and yt-dlp-ejs, which are on PyPI too, so nothing outside PyPI is needed (S8). Of yt-dlp's
 # default extras only requests is kept: without it, YouTube refused about 4 streams in 9 rather than 1 in 9.
 dependencies = [
-    "teabot[voice]>=1.8.0.dev0,<2",
+    "teabot[voice]>=1.9,<2",
     "av>=14",
     "yt-dlp>=2026.10.26",
     "yt-dlp-ejs>=0.8",
@@ -33,11 +33,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/teabot_music"]
-
-# Until teabot releases voice (teabot-dev/teabot#45), the plugin builds against that branch. Once it is released,
-# drop this and raise the range to the release.
-[tool.uv.sources]
-teabot = { git = "https://github.com/teabot-dev/teabot", branch = "feat/voice" }
 
 [tool.pytest.ini_options]
 addopts = "-p teabot.testing.fixtures"

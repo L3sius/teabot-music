@@ -188,8 +188,11 @@ class YtDlpSource:
             info = self._resolve(url)
         except SourceError:
             return
+        now = time.monotonic()
         with self._lock:
-            self._streams[url] = (time.monotonic() + STREAM_TTL_S, info)
+            # A prefetched track that was removed or skipped is never opened, so expired ones go here.
+            self._streams = {u: kept for u, kept in self._streams.items() if kept[0] > now}
+            self._streams[url] = (now + STREAM_TTL_S, info)
 
     def open(self, url: str, /, start_s: int = 0) -> Iterator[bytes]:
         info = self._resolve(url)
