@@ -1,0 +1,179 @@
+{
+  "commands": {
+    "description": "music commands",
+    "name": "music",
+    "options": [
+      {
+        "description": "Pause the song that is playing.",
+        "name": "pause",
+        "options": [],
+        "type": 1
+      },
+      {
+        "description": "Queue a song: a YouTube, SoundCloud or Spotify link, or words to search YouTube for.",
+        "name": "play",
+        "options": [
+          {
+            "description": "A link, or words to search YouTube for.",
+            "max_length": 300,
+            "name": "query",
+            "required": true,
+            "type": 3
+          },
+          {
+            "channel_types": [
+              2
+            ],
+            "description": "The voice channel to play in; the one you are in when left out.",
+            "name": "channel",
+            "required": false,
+            "type": 7
+          }
+        ],
+        "type": 1
+      },
+      {
+        "description": "What is playing, and what plays next.",
+        "name": "queue",
+        "options": [],
+        "type": 1
+      },
+      {
+        "description": "Take a song out of the queue.",
+        "name": "remove",
+        "options": [
+          {
+            "description": "Its number in /music queue.",
+            "max_value": 1000,
+            "min_value": 1,
+            "name": "number",
+            "required": true,
+            "type": 4
+          }
+        ],
+        "type": 1
+      },
+      {
+        "description": "Carry on with the paused song.",
+        "name": "resume",
+        "options": [],
+        "type": 1
+      },
+      {
+        "description": "Skip the song that is playing.",
+        "name": "skip",
+        "options": [],
+        "type": 1
+      },
+      {
+        "description": "Stop the music, clear the queue, and leave the voice channel.",
+        "name": "stop",
+        "options": [],
+        "type": 1
+      }
+    ],
+    "type": 1
+  },
+  "events": [
+    "track_end",
+    "voice_alone",
+    "voice_resume"
+  ],
+  "jobs": {
+    "leave_if_alone": {
+      "properties": {
+        "channel": {
+          "title": "Channel",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "channel"
+      ],
+      "title": "MusicLeaveIfAloneInput",
+      "type": "object"
+    },
+    "leave_if_idle": {
+      "properties": {},
+      "title": "MusicLeaveIfIdleInput",
+      "type": "object"
+    },
+    "play_next": {
+      "properties": {},
+      "title": "MusicPlayNextInput",
+      "type": "object"
+    }
+  },
+  "tools": {
+    "music_pause": {
+      "properties": {},
+      "title": "MusicPauseInput",
+      "type": "object"
+    },
+    "music_play": {
+      "properties": {
+        "channel": {
+          "anyOf": [
+            {
+              "pattern": "^[1-9][0-9]{0,19}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The voice channel to play in; the one you are in when left out.",
+          "title": "Channel"
+        },
+        "query": {
+          "description": "A link, or words to search YouTube for.",
+          "maxLength": 300,
+          "title": "Query",
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "title": "MusicPlayInput",
+      "type": "object"
+    },
+    "music_queue": {
+      "properties": {},
+      "title": "MusicQueueInput",
+      "type": "object"
+    },
+    "music_remove": {
+      "properties": {
+        "number": {
+          "description": "Its number in /music queue.",
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "number"
+      ],
+      "title": "MusicRemoveInput",
+      "type": "object"
+    },
+    "music_resume": {
+      "properties": {},
+      "title": "MusicResumeInput",
+      "type": "object"
+    },
+    "music_skip": {
+      "properties": {},
+      "title": "MusicSkipInput",
+      "type": "object"
+    },
+    "music_stop": {
+      "properties": {},
+      "title": "MusicStopInput",
+      "type": "object"
+    }
+  }
+}
