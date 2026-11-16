@@ -11,11 +11,12 @@
 """
 
 import html
+import io
 import re
 import threading
 import time
 import urllib.parse
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from fractions import Fraction
 from typing import Any, Protocol, cast
@@ -25,6 +26,7 @@ import certifi
 import yt_dlp
 from av.container import InputContainer
 from av.error import FFmpegError, HTTPForbiddenError
+from yt_dlp.networking import Request
 from yt_dlp.utils import DownloadError
 
 YOUTUBE = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"}
@@ -39,6 +41,14 @@ SEARCH = "ytsearch1:"
 
 class SourceError(Exception):
     """Why a track cannot be found or played, in words for the member."""
+
+
+DRM = "That track is DRM protected, which its label chose, so it cannot be played."
+
+
+def unavailable(exc: DownloadError, usual: str) -> SourceError:
+    """`usual`, or what yt-dlp found when it is a reason the member can act on, such as DRM."""
+    return SourceError(DRM if "DRM protected" in str(exc) else usual)
 
 
 @dataclass(frozen=True)
@@ -163,7 +173,7 @@ class YtDlpSource:
             with yt_dlp.YoutubeDL(cast(Any, options)) as ydl:
                 info = cast(dict[str, Any], ydl.extract_info(target, download=False))
         except DownloadError as exc:
-            raise SourceError("That could not be found, or is not available.") from exc
+            raise unavailable(exc, "That could not be found, or is not available.") from exc
         if playlist:
             return tracks_from(info, limit)
         return [found_from(_first(info))]
@@ -179,7 +189,7 @@ class YtDlpSource:
             with yt_dlp.YoutubeDL(cast(Any, options | {"noplaylist": True})) as ydl:
                 info = _first(cast(dict[str, Any], ydl.extract_info(url, download=False)))
         except DownloadError as exc:
-            raise SourceError("That track is no longer available.") from exc
+            raise unavailable(exc, "That track is no longer available.") from exc
         time.sleep(stream_wait(info, time.monotonic() - asked))
         return info
 
@@ -240,8 +250,24 @@ def stream_options(info: dict[str, Any]) -> dict[str, str]:
     }
 
 
+def segment_fetcher(headers: dict[str, str]) -> Callable[[str, int, dict[str, str]], io.BytesIO]:
+    """How FFmpeg opens the parts of a segmented stream, such as SoundCloud's HLS: through yt-dlp, which verifies
+    with certifi's certificates. FFmpeg passes a stream's `ca_file` to none of its segments, so they fail on Linux
+    as the stream itself once did. A segment is a few seconds of audio, so it is held in memory."""
+
+    def fetch(url: str, flags: int, options: dict[str, str]) -> io.BytesIO:
+        params: Any = {"quiet": True, "no_warnings": True}
+        with yt_dlp.YoutubeDL(params) as ydl, ydl.urlopen(cast(Any, Request(url, headers=headers))) as reply:
+            return io.BytesIO(reply.read())
+
+    return fetch
+
+
 def _open(info: dict[str, Any]) -> InputContainer:
     options = stream_options(info)
+    if str(info.get("protocol", "")).startswith("m3u8"):
+        fetch = segment_fetcher(cast(dict[str, str], info.get("http_headers") or {}))
+        return av.open(str(info["url"]), options=options, timeout=WEB_TIMEOUT_S, io_open=fetch)
     return av.open(str(info["url"]), options=options, timeout=WEB_TIMEOUT_S)
 
 

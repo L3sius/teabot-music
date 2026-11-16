@@ -11,19 +11,23 @@ import av
 import certifi
 import pytest
 from av.error import HTTPForbiddenError
+from yt_dlp.utils import DownloadError
 
 from teabot_music import sources
 from teabot_music.sources import (
+    DRM,
     SourceError,
     YtDlpSource,
     found_from,
     is_playlist,
     packets,
+    segment_fetcher,
     spotify_search,
     stream_options,
     stream_wait,
     target_of,
     tracks_from,
+    unavailable,
 )
 
 SECOND = 50  # packets of 20 ms
@@ -193,3 +197,54 @@ def test_streams_are_opened_with_certifis_certificates() -> None:
     options = stream_options({"http_headers": {"User-Agent": "x"}})
     assert options["ca_file"] == certifi.where()
     assert options["headers"] == "User-Agent: x\r\n"
+
+
+def test_a_drm_protected_track_says_so() -> None:
+    assert str(unavailable(DownloadError("ERROR: [soundcloud] 1: This video is DRM protected"), "x")) == DRM
+    assert str(unavailable(DownloadError("ERROR: [youtube] gone"), "Not available.")) == "Not available."
+
+
+def test_a_segmented_stream_opens_its_segments_through_yt_dlp(monkeypatch: pytest.MonkeyPatch) -> None:
+    asked: list[tuple[str, dict[str, str]]] = []
+
+    class Reply:
+        def __enter__(self) -> "Reply":
+            return self
+
+        def __exit__(self, *_: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return b"segment"
+
+    class Downloader:
+        def __init__(self, params: dict[str, Any]) -> None:
+            pass
+
+        def __enter__(self) -> "Downloader":
+            return self
+
+        def __exit__(self, *_: object) -> None:
+            return None
+
+        def urlopen(self, request: Any) -> Reply:
+            asked.append((request.url, dict(request.headers)))
+            return Reply()
+
+    monkeypatch.setattr(sources.yt_dlp, "YoutubeDL", Downloader)
+    fetched = segment_fetcher({"Referer": "https://soundcloud.com/"})("https://cdn.test/data000.m4s", 0, {})
+    assert fetched.read() == b"segment"
+    assert asked[0][0] == "https://cdn.test/data000.m4s"
+    assert asked[0][1]["Referer"] == "https://soundcloud.com/"
+
+
+def test_only_a_segmented_stream_routes_through_yt_dlp(monkeypatch: pytest.MonkeyPatch) -> None:
+    opened: list[dict[str, Any]] = []
+
+    def fake_open(url: str, **kwargs: Any) -> Any:
+        opened.append(kwargs)
+
+    monkeypatch.setattr(sources.av, "open", fake_open)
+    sources._open({"url": "https://cdn.test/playlist.m3u8", "protocol": "m3u8_native"})  # pyright: ignore[reportPrivateUsage]
+    sources._open({"url": "https://cdn.test/audio.webm", "protocol": "https"})  # pyright: ignore[reportPrivateUsage]
+    assert ["io_open" in o for o in opened] == [True, False]
